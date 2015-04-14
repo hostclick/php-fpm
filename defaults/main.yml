@@ -1,0 +1,42 @@
+# Set to base for php 5.3
+php_fpm_extra_repo: remi
+
+php_fpm_listen: /var/run/php-fpm/fpm.sock
+php_fpm_listen_allowed_clients: 127.0.0.1
+php_fpm_listen_mode: "0666"
+
+php_extensions:
+    - php
+    - php-fpm
+    - php-common
+    - php-cli
+    - php-mysqlnd
+    - php-soap
+    - php-mysql
+    - php-xml
+    - php-mcrypt
+    - php-mbstring 
+    - php-gd 
+    - php-intl
+    - php-pecl-mongo
+
+pm_max_children: "{{ ((ansible_memtotal_mb / (php_memory_limit_in_mb|int))|round(0, 'ceil'))|int }}"
+pm_max_requests: 1000
+
+php_fpm_log_level: error
+
+php_timezone: America/Argentina/Buenos_Aires
+php_error_reporting: E_COMPILE_ERROR|E_RECOVERABLE_ERROR|E_ERROR|E_CORE_ERROR
+php_upload_max_filesize: 2M
+php_post_max_size: 8M
+php_default_socket_timeout: 30
+php_max_execution_time: 30
+php_memory_limit_in_mb: 128
+php_cgi_fix_pathinfo: 1
+
+zend_opcache: 'no'
+
+php_pear_channels:
+  - pear.php.net
+  
+php_pear_libraries: none

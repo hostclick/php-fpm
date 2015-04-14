@@ -1,0 +1,13 @@
+- name: Install Zend OpCache extension 
+  yum: name=php-pecl-zendopcache state=present enablerepo=remi
+  notify: restart php-fpm
+
+- name: Copy Zend OpCache configuration
+  template: src=opcache.ini.j2 dest=/etc/php.d/opcache.ini
+  notify: restart php-fpm
+  
+- name: Create the directory for clear cache script
+  file: path=/opt/php-fpm state=directory owner=root group=root mode=0755
+  
+- name: Copy clear cache script
+  template: src=clear_opcache.sh.j2 dest=/opt/php-fpm/clear_opcache.sh owner=root group=root mode=0755

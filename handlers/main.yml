@@ -1,0 +1,4 @@
+---
+- name: restart php-fpm
+  service: name=php-fpm state=restarted
+  when: php_fpm_daemon is not defined or php_fpm_daemon|bool == true
