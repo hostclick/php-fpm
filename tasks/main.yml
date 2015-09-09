@@ -1,50 +1,54 @@
 ---
-- action: setup
+- name: Ensure certain php extensiones are absent
+  yum: name={{ item }} state=absent enablerepo={{ php_fpm_extra_repo }}
+  with_items: php_extensions_disabled
   tags: php-fpm
 
 - name: Install php-fpm and deps
   yum: name={{ item }} state=present enablerepo={{ php_fpm_extra_repo }}
   with_items: php_extensions
   tags: php-fpm
-  
+
 - name: Copy php.ini configuration
   template: src=php.ini.j2 dest=/etc/php.ini
   notify: restart php-fpm
   tags: php-fpm
-  
+
 - name: Copy php-fpm pool configuration
   template: src=php-fpm.conf.j2 dest=/etc/php-fpm.conf
   notify: restart php-fpm
-  
+  tags: php-fpm
+
 - name: Copy php-fpm configuration
   template: src=www.conf.j2 dest=/etc/php-fpm.d/www.conf
   notify: restart php-fpm
-  
+  tags: php-fpm
+
 - name: Check php-fpm syntax of configuration files
   shell: php-fpm -t
   register: result
   failed_when: "result.rc != 0"
+  changed_when: false
+  tags: php-fpm
 
 - name: Start the php-fpm service
   service: name=php-fpm state=started enabled=yes
   when: php_fpm_daemon is not defined or php_fpm_daemon|bool == true
+  tags: php-fpm
 
 - name: Stop the php-fpm service
   service: name=php-fpm state=stopped enabled=no
   when: php_fpm_daemon is defined and php_fpm_daemon|bool == false
+  tags: php-fpm
 
 - include: zend_opcache.yml
   when: zend_opcache|lower != 'no' and php_fpm_extra_repo|lower == 'remi'
   tags: php-fpm
-  
+
 - include: apps.yml
   when: php_fpm_apps is defined
   tags: php-fpm
-  
+
 - include: pear.yml
   when: php_pear_libraries|lower != 'none'
   tags: php-fpm
-
-
-
- 
